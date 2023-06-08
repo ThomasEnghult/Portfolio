@@ -432,16 +432,15 @@ My favourite contributions to juicing the game is the following:
 
 <table>
   <tr>
-    <td><img src="Images\EOTM_pencil_wall.gif" /> <font size="2">  
-  <i>Pencil gets stuck on the wall</font></td>
-    <td><img src="Images\EOTM_items.gif" /> <font size="2">  
-  <i>Item pickup and dropping</font></td>
+    <td><img src="Images\EOTM_pencil_wall.gif" /> <br> <i>Pencil gets stuck on the wall</td>
+    <td><img src="Images\EOTM_items.gif" />
+  <br> <i>Item pickup and dropping</td>
   </tr>
   <tr>
-    <td><img src="Images\EOTM_aimline.gif" /> <font size="2">  
-  <i>The laser extends based on bullet velocity</font></td>
-    <td><img src="Images\EOTM_masking.gif" /> <font size="2">  
-  <i>Player sprite is masked by the green area</font></td>
+    <td><img src="Images\EOTM_aimline.gif" />
+  <br> <i>The laser extends based on bullet velocity</td>
+    <td><img src="Images\EOTM_masking.gif" />
+  <br> <i>Player sprite is masked by the green area</td>
   </tr>
 </table>
 
@@ -798,10 +797,10 @@ The camera stays within the bounds of the map and can do so while zooming in and
 
 <table>
   <tr>
-    <td><img src="Images\EOTM_CameraController.gif" /> <font size="2">  
-  <i>Adjusting camera settings</font></td>
-    <td><img src="Images\EOTM_04.gif" /> <font size="2">  
-  <i>The Camera follows the action and stays within the map</font></td>
+    <td><img src="Images\EOTM_CameraController.gif" /> 
+  <br> <i>Adjusting camera settings</td>
+    <td><img src="Images\EOTM_04.gif" /> 
+  <br> <i>The Camera follows the action and stays within the map</td>
   </tr>
 
 </table>
@@ -1006,9 +1005,9 @@ It was quite a challenge to implement due to it being added late into developmen
 
 <table>
   <tr>
-    <td><img src="Images\EOTM_gamemodes.gif" /> </td>
-    <td><img src="Images\EOTM_02.gif" /> <font size="2">  
-  <i> Free for All King of the Hill</font></td>
+    <td><img src="Images\EOTM_gamemodes.gif" />  </td>
+    <td><img src="Images\EOTM_02.gif" />
+  <br> <i> Free for All King of the Hill</td>
   </tr>
 </table>
 
