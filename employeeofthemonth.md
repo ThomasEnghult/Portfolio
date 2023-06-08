@@ -1,6 +1,7 @@
 # *Employee of the Month*
 
 ## *A brief game description*
+
 Employee of the month is a 2D, 4 player arena shooter where you pick up office supplies and modify your improvised handmade weapon to shoot at your co-workers.  
 Different office supplies gives unique effects and alter your weapon accordingly. Each round you have only one life and the last man standing wins the round.
 
@@ -9,12 +10,12 @@ Different office supplies gives unique effects and alter your weapon accordingly
 
 
 ## *My contributions to this project*
+
 Below is a summary of my code written to this game, keep in mind that this is a group effort and we co-developed a lot of features, but all the highlighted features below have been implemented by me. 
 
 ---
 
 ## - **Creating the weapon**
-
 
 <table>
   <tr>
@@ -35,7 +36,6 @@ Click the dropdown arrow or click the link below to see the code
 
 <details>
 <summary>Item ScriptableObject</summary>
-<br>
 
  ```CS
 using UnityEngine;
@@ -127,7 +127,6 @@ public class NewItemScriptableObject : ScriptableObject
 
 <details>
 <summary>Weapon</summary>
-<br>
 
  ```csharp
  using System.Collections;
@@ -419,9 +418,8 @@ public class WeaponController : MonoBehaviour
     }
 
 }
-
-
 ```
+
 </details>
 
 ---
