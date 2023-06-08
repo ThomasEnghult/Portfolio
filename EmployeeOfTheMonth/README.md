@@ -37,7 +37,7 @@ Click the dropdown arrow or click the link below to see the code
 <details>
 <summary>Item ScriptableObject</summary>
 
- ```CS
+ ```csharp
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewItem", menuName = "ScriptableObjects/NewItemScriptableObject", order = 1)]
