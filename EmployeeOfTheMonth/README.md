@@ -1,5 +1,7 @@
 # *Employee of the Month*
 
+<img src="Images\EOTM_menu.jpg" width="100%"/>
+
 [Itch.io page](https://yrgo-game-creator.itch.io/employee-of-the-month)  
 
 [Repository Link](https://github.com/MikaelahJ/EmployeeOfTheMonth/tree/main)  
