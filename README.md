@@ -14,6 +14,6 @@ Welcome to my website! This is the home page content.
 </table>
 
 
-## [*Employee of the Month*](employeeofthemonth/README.md)
+## [*Employee of the Month*](EmployeeOfTheMonth/)
 
 
