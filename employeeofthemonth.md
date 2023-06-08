@@ -1,8 +1,9 @@
 <head>
   <!-- Include the Prism.js library and the C# language support -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-tomorrow.min.css"> <!-- CDN link to the dark theme CSS file -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-csharp.min.js"></script>
 </head>
+
 <body>
 
 # *Employee of the Month*
