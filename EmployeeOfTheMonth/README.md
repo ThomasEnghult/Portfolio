@@ -1,5 +1,9 @@
 # *Employee of the Month*
 
+[Itch.io page](https://yrgo-game-creator.itch.io/employee-of-the-month)  
+
+[Repository Link](https://github.com/MikaelahJ/EmployeeOfTheMonth/tree/main)  
+
 ## *A brief game description*
 
 Employee of the month is a 2D, 4 player arena shooter where you pick up office supplies and modify your improvised handmade weapon to shoot at your co-workers.  
@@ -1005,9 +1009,9 @@ It was quite a challenge to implement due to it being added late into developmen
 
 <table>
   <tr>
-    <td><img src="Images\EOTM_gamemodes.gif" />  </td>
-    <td><img src="Images\EOTM_02.gif" />
-  <br> <i> Free for All King of the Hill</td>
+    <td><img src="Images\EOTM_gamemodes.gif"/> </td>
+    <td><img src="Images\EOTM_02.gif"/>
+  <br> <i> 4 Player Free for All King of the Hill gamemode</td>
   </tr>
 </table>
 
