@@ -15,10 +15,11 @@ Below is a summary of my code written to this game, keep in mind that this is a 
 
 ## - **Creating the weapon**
 
+
 <table>
   <tr>
-    <td><img src="Images\EOTM_weapon-pickup.gif"/>  
-  <i>Shredder adds more bullets, Pencil Sharperner  pierce glass</td>
+    <td><img src="Images\EOTM_weapon-pickup.gif"/>
+  <br> <i>Shredder adds more bullets, Pencil Sharperner  pierce glass</i></td>
     <td><img src="Images\EOTM_scriptable_objects.png" /></td>
   </tr>
 </table>
@@ -36,7 +37,7 @@ Click the dropdown arrow or click the link below to see the code
 <summary>Item ScriptableObject</summary>
 <br>
 
- ```csharp
+ ```CS
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewItem", menuName = "ScriptableObjects/NewItemScriptableObject", order = 1)]
