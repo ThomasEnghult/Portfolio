@@ -17,8 +17,8 @@ Below is a summary of my code written to this game, keep in mind that this is a 
 
 <table>
   <tr>
-    <td><img src="Images\EOTM_weapon-pickup.gif"/> <font size="1">  
-  <i>Shredder adds more bullets, Pencil Sharperner  pierce glass </font> </td>
+    <td><img src="Images\EOTM_weapon-pickup.gif"/>  
+  <i>Shredder adds more bullets, Pencil Sharperner  pierce glass</td>
     <td><img src="Images\EOTM_scriptable_objects.png" /></td>
   </tr>
 </table>
