@@ -1,10 +1,10 @@
 <head>
-  <!-- Include the Prism.js library and the C# language support -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-csharp.min.js"></script>
+  <!-- Add the following line to include highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/languages/unity.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 </head>
-
-<body>
 
 # *Employee of the Month*
 
@@ -14,6 +14,8 @@ Employee of the month is a 2D, 4 player arena shooter where you pick up office s
 Different office supplies gives unique effects and alter your weapon accordingly. Each round you have only one life and the last man standing wins the round.
 
 ---
+
+
 
 ## *My contributions to this project*
 
@@ -43,7 +45,7 @@ Click the dropdown arrow or click the link below to see the code
 <details>
 <summary>Item ScriptableObject</summary>
 
-<pre><code class="language-csharp">
+<pre><code class="csharp">
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewItem", menuName = "ScriptableObjects/NewItemScriptableObject", order = 1)]
@@ -1160,8 +1162,3 @@ public class KingOfTheHillScript : MonoBehaviour
 }
 ```
 </details>
-
-
-<script>Prism.highlightAll();</script>
-
-</body>
