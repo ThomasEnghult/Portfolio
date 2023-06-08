@@ -1,11 +1,3 @@
-<head>
-  <!-- Add the following line to include highlight.js -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/languages/unity.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-</head>
-
 # *Employee of the Month*
 
 ## *A brief game description*
@@ -45,7 +37,7 @@ Click the dropdown arrow or click the link below to see the code
 <details>
 <summary>Item ScriptableObject</summary>
 
-<pre><code class="unity">
+ ```CS
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewItem", menuName = "ScriptableObjects/NewItemScriptableObject", order = 1)]
@@ -130,8 +122,7 @@ public class NewItemScriptableObject : ScriptableObject
     [Header("Animations")]
     public bool hasAnimations = false;
 }
-</code></pre>
-
+```
 </details>
 
 <details>
