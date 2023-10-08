@@ -60,7 +60,7 @@ public class PourLiquid : MonoBehaviour
 {
     private Liquid liquid;
 
-    public LinkedList<Vector3[]> linkedList = new LinkedList<Vector3[]>();
+    public LinkedList<Vector3[]> trajectories = new LinkedList<Vector3[]>();
     public Vector3[] splineTrajectory;
     public Vector3[] currentTrajectory;
 
@@ -167,11 +167,11 @@ public class PourLiquid : MonoBehaviour
         DrawProjection();
 
         Vector3[] copy = (Vector3[])currentTrajectory.Clone();
-        linkedList.AddFirst(copy);
+        trajectories.AddFirst(copy);
 
-        for (int i = 0; i < linkedList.Count && i < LinePoints; i++)
+        for (int i = 0; i < trajectories.Count && i < LinePoints; i++)
         {
-            Vector3[] nthTrajectory = linkedList.ElementAt(i);
+            Vector3[] nthTrajectory = trajectories.ElementAt(i);
             if (nthTrajectory == null)
             {
                 return;
@@ -181,9 +181,9 @@ public class PourLiquid : MonoBehaviour
             splineTrajectory[i] = point;
         }
 
-        if (linkedList.Count > LinePoints)
+        if (trajectories.Count > LinePoints)
         {
-            linkedList.RemoveLast();
+            trajectories.RemoveLast();
         }
     }
 
@@ -207,7 +207,7 @@ public class PourLiquid : MonoBehaviour
 
             Vector3 lastPosition = currentTrajectory[i - 1];
 
-            bool collided = Physics.Raycast(lastPosition, point - lastPosition, out RaycastHit hit, (point - lastPosition).magnitude, PourCollisionMask); //Add collision Mask?
+            bool collided = Physics.Raycast(lastPosition, point - lastPosition, out RaycastHit hit, (point - lastPosition).magnitude, PourCollisionMask);
 
             if (collided && hit.collider.gameObject != gameObject)
             {
@@ -226,8 +226,6 @@ public class PourLiquid : MonoBehaviour
                     i++;
                 }
 
-                //DrawDebugLines(currentTrajectory, Color.white, TimeBetweenPoints * 5);
-
                 return;
             }
         }
@@ -235,7 +233,6 @@ public class PourLiquid : MonoBehaviour
 
     public void Pour(Color color)
     {
-        //Debug.Log("PourLiquid: Pour");
         couroutine_Flowing = Couroutine_StartFlow(color);
         StartCoroutine(couroutine_Flowing);
     }
@@ -248,7 +245,6 @@ public class PourLiquid : MonoBehaviour
 
         if (liquid == null)
             return;
-        //Debug.Log("LiquidPour: Stopping " + liquid.transform.name);
 
         liquid.StopFlow();
     }
@@ -261,18 +257,6 @@ public class PourLiquid : MonoBehaviour
         CancelInvoke();
 
         pourStrengthLimiter = 1;
-    }
-
-    void DrawDebugLines(Vector3[] points, Color color, float duration)
-    {
-        for (int i = 0; i < points.Length; i++)
-        {
-            if (points[i + 1] == Vector3.zero)
-                break;
-
-            Debug.DrawLine(points[i], points[i + 1], color, duration);
-
-        }
     }
 
     public void SetPourStrength(float tilt)
@@ -340,16 +324,6 @@ public class PourLiquid : MonoBehaviour
         canHaveAttributes.AddAttributes(gameObject, liquidLost);
     }
 
-    void PlayParticle()
-    {
-        liquid.ps_waterSplash.Play();
-    }
-
-    void StopParticle()
-    {
-        liquid.ps_waterSplash.Stop();
-    }
-
     private void OnDisable()
     {
         if (isPouring)
@@ -363,298 +337,274 @@ public class PourLiquid : MonoBehaviour
 </details>
 
 <details>
-<summary>Weapon</summary>
+<summary>Liquid</summary>
 
  ```csharp
- using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using SplineMesh;
 
-public class WeaponController : MonoBehaviour
+public class Liquid : MonoBehaviour
 {
-    public int itemSlots = 3;
-    [Header("Equipped Weapon")]
-    public NewItemScriptableObject weapon;
+    public PourLiquid pourLiquid;
 
-    [Header("Base Weapon")]
-    public NewItemScriptableObject baseWeapon;
+    [SerializeField] Vector3 scale;
 
-    [Header("Equipped Items")]
-    public NewItemScriptableObject[] items;
+    [SerializeField] Material material;
+    [SerializeField] Spline spline;
+    [SerializeField] ExampleContortAlong contortAlong;
 
-    public UIItemHolder itemHolder;
+    [SerializeField] float speedDelta;
+    [SerializeField] float animationSpeed;
+    private float localAnimSpeed;
 
-    private AudioSource sound;
+    private Vector3 targetScale;
+    private float speedCurveLerp;
+    private float length;
 
-    public bool isDead = false;
+    private Vector3 startScale;
+    private float meshLength;
+    [SerializeField] private float maxSpeed = 10f;
+    private bool flowWater = true;
 
-    [SerializeField] private Laser laserScript;
-    [SerializeField] private Fire fireScript;
+    public ParticleSystem ps_waterSplash;
+    Vector3 impactPos;
+    Vector3 impactUp;
 
-    void Start()
+    public void StartFlow(Color color)
     {
-        items = new NewItemScriptableObject[itemSlots];
-        UpdateWeaponStats();
+        Debug.Log(gameObject.name + ": Starting Flow");
+        StopAllCoroutines();
+        flowWater = true;
 
-        sound = GetComponent<AudioSource>();
-        sound.volume = AudioManager.instance.audioClips.sfxVolume;
+        SetColor(color);
+        Init();
+        StartCoroutine(Coroutine_WaterFlow());
     }
 
-    public void AddItem(NewItemScriptableObject item)
+    public void StopFlow()
     {
-        if (isDead)
-        {
-            Debug.Log("Can't add item: Player is dead!");
-            return;
-        }
-
-        for (int i = 0; i < items.Length; i++)
-        {
-            if (items[i] == null)
-            {
-                items[i] = Instantiate(item);
-                if (itemHolder != null)
-                {
-                    itemHolder.AddItem(item, i);
-                }
-                Debug.Log("Added item: " + item.name);
-                //Play pickup sound
-                sound.volume = AudioManager.instance.audioClips.sfxVolume;
-                sound.PlayOneShot(item.onPickup);
-
-                UpdateWeaponStats();
-
-                return;
-            }
-        }
-        Debug.Log("Inventory full, can't add item: " + item.name);
-    }
-
-    public (bool, int) CanAddItem()
-    {
-        for (int i = 0; i < items.Length; i++)
-        {
-            if (items[i] == null)
-            {
-                return (true, i);
-            }
-        }
-
-        return (false, -1);
+        Debug.Log(gameObject.name + ": Stopping flow");
+        flowWater = false;
     }
 
 
-    public void RemoveAllItems()
+    void Init()
     {
-        laserScript.DiscardSuperSprite();
+        //Debug.Log("Init");
+        ConfigureSpline();
 
-        for (int i = 0; i < items.Length; i++)
-        {
-            RemoveItem(i, false);
-        }
-        Debug.Log("Removed all items from weapon!");
+        contortAlong.Init();
+
+        meshLength = contortAlong.MeshBender.Source.Length;
+        meshLength = meshLength == 0 ? 1 : meshLength;
+
+        localAnimSpeed = animationSpeed / scale.x;
+
+        UpdateScale();
+
+        speedCurveLerp = 0;
+        length = 0;
+
+        gameObject.SetActive(true);
     }
 
-    public void RemoveItem(int index, bool playSound)
+    public void UpdateScale()
     {
-        if (items[index] == null)
-        {
-            Debug.Log("Can't remove item at position " + index + ", item not found");
-            return;
-        }
+        //Scale the mesh to the length of the spline
+        float scaleFactor = spline.Length * (1f / meshLength);
 
-        //Play item removed sound
-        if (playSound)
-        {
-            sound.volume = AudioManager.instance.audioClips.sfxVolume;
-            sound.PlayOneShot(items[index].onDestroy);
-        }
+        Vector3 localScale = scale;
+        localScale.x = scale.x * scaleFactor;
 
-        //Remove item sprite from weapon
-        if (itemHolder != null)
-        {
-            itemHolder.RemoveItem(index, items[index]);
-        }
-        //Remove item from weapon
-        Debug.Log("Removed item: " + items[index].name);
-        items[index] = null;
-        UpdateWeaponStats();
+        startScale = localScale;
+        startScale.x = 0;
+        targetScale = localScale;
     }
 
-    void UpdateWeaponStats()
+    IEnumerator Coroutine_WaterFlow()
     {
-        NewItemScriptableObject newWeapon = Instantiate(baseWeapon);
-        newWeapon.name = "Weapon";
-        bool checkIfUltimate = true;
-        for (int i = 0; i < items.Length; i++)
+        //Debug.Log(gameObject.name + ": Flow Started");
+        while (flowWater)
         {
-            //Check if we have item to add to gun
-            if (items[i] == null)
+            //Moves the mesh along the spline by scaling it, targetScale updates depending on the length of the spline
+            contortAlong.ScaleMesh(Vector3.Lerp(startScale, targetScale, length / meshLength));
+
+            //Increments the lerp value if we haven't reached a lerp value of 1;
+            if (length < meshLength)
             {
-                checkIfUltimate = false;
-                continue;
-            }
-
-            NewItemScriptableObject item = items[i];
-
-            if (i != 0)
-            {
-                //Check if previous item we added is the same
-                checkIfUltimate = checkIfUltimate && item.name == items[i - 1].name;
-            }
-
-            //Weapon Modifiers
-            if (newWeapon.fireSoundPriority < item.fireSoundPriority)
-            {
-                newWeapon.fireSoundPriority = item.fireSoundPriority;
-                newWeapon.fire = item.fire;
-            }
-
-            if (newWeapon.bulletImpactPriority < item.bulletImpactPriority)
-            {
-                newWeapon.bulletImpactPriority = item.bulletImpactPriority;
-                newWeapon.bulletImpactSound = item.bulletImpactSound;
-            }
-
-            newWeapon.ammo += item.ammo;
-            newWeapon.ammoWeight *= item.ammoWeight;
-            newWeapon.weaponDamage += item.weaponDamage;
-            newWeapon.baseFireRate *= (1 + (item.fireRatePercentage / 100f));
-            newWeapon.recoilModifier += item.recoilModifier;
-            newWeapon.accuracy *= (item.accuracy / 100f);
-            newWeapon.maxMissDegAngle += item.maxMissDegAngle;
-            newWeapon.isShotgun = newWeapon.isShotgun || item.isShotgun;
-            newWeapon.shotgunAmount += item.shotgunAmount;
-
-            //Bullet Modifiers
-            if (newWeapon.bulletSpritePriority < item.bulletSpritePriority)
-            {
-                newWeapon.bulletSpritePriority = item.bulletSpritePriority;
-                newWeapon.bulletSprite = item.bulletSprite;
-            }
-
-            newWeapon.bulletVelocity += item.bulletVelocity;
-            newWeapon.isBouncy = newWeapon.isBouncy || item.isBouncy;
-            newWeapon.numOfBounces += item.numOfBounces;
-            newWeapon.numOfPenetrations += item.numOfPenetrations;
-            newWeapon.isPenetrate = newWeapon.isPenetrate || item.isPenetrate;
-            newWeapon.isExplosive = newWeapon.isExplosive || item.isExplosive;
-            newWeapon.explosionRadius += item.explosionRadius;
-            newWeapon.explosionDamage += item.explosionDamage;
-            newWeapon.isKnockback = newWeapon.isKnockback || item.isKnockback;
-            newWeapon.knockbackModifier += item.knockbackModifier;
-            newWeapon.isHoming = newWeapon.isHoming || item.isHoming;
-            newWeapon.turnSpeed += item.turnSpeed;
-            newWeapon.scanBounds += item.scanBounds;
-            newWeapon.isStapler = newWeapon.isStapler || item.isStapler;
-            newWeapon.stunTime += item.stunTime;
-            newWeapon.speedSlowdown += item.speedSlowdown;
-        }
-
-        //Add ultimate effects
-        if (checkIfUltimate)
-        {
-            Debug.Log("Equipped ultimate: itemName" + items[0].name);
-            if (items[0].name == "Microwave(Clone)")
-            {
-                newWeapon.isSuperMicro = true;
-            }
-
-            if (items[0].name == "Pencil Sharpener(Clone)")
-            {
-                fireScript.shakeDuration = 0.4f;
-                fireScript.shakeMagnitude = 0.5f;
-                GetComponent<Fire>().bulletSizeMultiplier = 2f;
-            }
-
-            if (items[0].name == "Rubber(Clone)")
-            {
-                GetComponent<Fire>().isUltimateRubber = true;
-                newWeapon.numOfBounces = 50;
-            }
-
-            if (items[0].name == "Shredder(Clone)")
-            {
-                fireScript.shakeDuration = 0.4f;
-                fireScript.shakeMagnitude = 0.2f;
-                newWeapon.shotgunAmount = 30;
-                newWeapon.isSuperShredder = true;
-            }
-
-            if (items[0].name == "Stapler(Clone)")
-            {
-                newWeapon.stunTime = 3;
-                newWeapon.isSuperStapler = true;
-            }
-
-            if (items[0].ultimateFire != null)
-            {
-                newWeapon.fire = items[0].ultimateFire;
-                newWeapon.ultimateFire = items[0].ultimateFire;
-            }
-        }
-        else
-        {
-            fireScript.shakeDuration = 0f;
-            fireScript.shakeMagnitude = 0f;
-            GetComponent<Fire>().bulletSizeMultiplier = 1f;
-            GetComponent<Fire>().isUltimateRubber = false;
-        }
-        weapon = newWeapon;
-        UpdateFireStats();
-        UpdateAimLine();
-    }
-
-    public void LoseItemAmmo(float shots)
-    {
-        for (int i = 0; i < items.Length; i++)
-        {
-            if (items[i] != null)
-            {
-                items[i].ammo -= shots;
-                if (items[i].ammo <= 0)
-                {
-                    RemoveItem(i, true);
-                }
-            }
-        }
-    }
-
-    void UpdateFireStats()
-    {
-        if (GetComponent<Fire>() != null)
-        {
-            GetComponent<Fire>().UpdateFireModifiers();
-        }
-    }
-
-    void UpdateAimLine()
-    {
-        if (GetComponentInChildren<AimLine>() != null)
-        {
-            AimLine aimLine = GetComponentInChildren<AimLine>();
-            if(CanAddItem().Item2 == 0)
-            {
-                aimLine.laserMaxLength = 0;
+                length += Time.deltaTime * localAnimSpeed * speedCurveLerp;
+                speedCurveLerp = Mathf.Clamp(speedCurveLerp + speedDelta * Time.deltaTime, 0, maxSpeed);
             }
             else
             {
-                aimLine.laserMaxLength = 3 * (weapon.bulletVelocity / baseWeapon.bulletVelocity);
+                length = meshLength;
             }
-        }
-    }
 
-    public int NumOfItems()
-    {
-        int count = 0;
-        foreach (var item in items)
+            ps_waterSplash.transform.position = impactPos;
+            ps_waterSplash.transform.up = impactUp;
+
+            yield return null;
+        }
+
+        float count = 0;
+        speedCurveLerp = 0;
+
+        while (count < spline.Length)
         {
-            if (item != null) { count++; }
+            //Retracts the splineMesh along the spline
+            contortAlong.Contort((count / spline.Length));
+
+            count += Time.deltaTime * localAnimSpeed * speedCurveLerp;
+            speedCurveLerp = Mathf.Clamp(speedCurveLerp + speedDelta * Time.deltaTime, 0, maxSpeed);
+            yield return null;
+
         }
-        return count;
+
+        Debug.Log(gameObject.name + ": Flow Stopped");
+
+        pourLiquid?.ReturnLiquid();
+        gameObject.SetActive(false);
+    }
+    private void ConfigureSpline()
+    {
+        Vector3[] points = pourLiquid.splineTrajectory;
+
+        Vector3 targetDirection = (pourLiquid.transform.up);
+        transform.forward = new Vector3(targetDirection.x, 0, targetDirection.z).normalized;
+
+        List<SplineNode> nodes = new List<SplineNode>(spline.nodes);
+        for (int i = 2; i < nodes.Count; i++)
+        {
+            spline.RemoveNode(nodes[i]);
+        }
+
+        UpdateSpline();
     }
 
+    public void UpdateSpline()
+    {
+        if (!flowWater)
+        {
+            return;
+        }
+
+        Vector3[] points = pourLiquid.splineTrajectory;
+
+        //If the spline trajectory is the shortest possible, containing only a start point and end point, we process it manually
+        if (points[2] == Vector3.zero)
+        {
+            Vector3 point = points[0];
+            Vector3 myAngle = points[0] - points[1];
+
+            Vector3 normal = Quaternion.Euler(myAngle) * myAngle;
+            Vector3 direction = point - (normal / 3f);
+
+            spline.nodes[0].Position = transform.InverseTransformPoint(points[0]);
+            spline.nodes[0].Direction = transform.InverseTransformPoint(direction);
+
+            spline.nodes[1].Position = transform.InverseTransformPoint(points[1]);
+            spline.nodes[1].Direction = transform.InverseTransformPoint(direction);
+
+            RemoveUnusedSplines(2);
+
+            impactPos = spline.nodes[1].Position;
+            impactUp = spline.nodes[1].Direction;
+
+            return;
+        }
+
+        int maxPoints = pourLiquid.LinePoints;
+        int nodeCount = 0;
+
+        for (int i = 0; i < maxPoints; i += 2, nodeCount++)
+        {
+            Vector3 point = points[i];
+
+            //Logic for detecting when we reached the end of the spline trajectory
+            if (point == Vector3.zero)
+            {
+                //If we stopped on an uneven point (we have i += 2) we register the middle step as a node instead
+                if (points[i - 1] != Vector3.zero)
+                {
+                    impactPos = points[i - 1];
+                    impactUp = points[i - 2] - points[i - 1];
+                    i--;
+                    maxPoints = 0;
+                }
+                //We have stopped at correct point and just need to get the impact position
+                else
+                {
+                    impactPos = points[i - 2];
+                    impactUp = points[i - 3] - points[i - 2];
+                    break;
+                }
+
+            }
+
+            if (spline.nodes.Count <= nodeCount)
+            {
+                spline.AddNode(new SplineNode(Vector3.zero, Vector3.forward));
+            }
+
+            if (point == Vector3.zero && i > 2)
+            {
+                point = points[i - 1];
+                point += point - points[i - 2];
+            }
+
+            Vector3 myAngle;
+
+            if (points[i + 1] == Vector3.zero && i > 0)
+                myAngle = -(points[i] - points[i - 1]);
+            else
+                myAngle = points[i] - points[i + 1];
+
+            Vector3 normal = Quaternion.Euler(myAngle) * myAngle;
+            Vector3 direction = point - (normal / 2f);
+
+
+            spline.nodes[nodeCount].Position = transform.InverseTransformPoint(point);
+            spline.nodes[nodeCount].Direction = transform.InverseTransformPoint(direction);
+        }
+
+        RemoveUnusedSplines(nodeCount);
+
+        UpdateScale();
+    }
+
+    void RemoveUnusedSplines(int nodeCount)
+    {
+        for (int i = spline.nodes.Count - 1; i > nodeCount - 1; i--)
+        {
+            spline.RemoveNode(spline.nodes[i]);
+            //Debug.Log("points: " + line.positionCount);
+            //Debug.Log("Removing node: " + i);
+        }
+    }
+
+    public void SetColor(Color color)
+    {
+        Material newMaterial = new Material(material);
+
+        newMaterial.SetColor("_Color", color);
+
+        contortAlong.material = newMaterial;
+
+        if (ps_waterSplash != null)
+        {
+            float particleColorGradient = 0.2f;
+            //Create a light/dark gradient from our gameobject color
+            var gradient = new ParticleSystem.MinMaxGradient(color * (1 - particleColorGradient), color * (1 + particleColorGradient));
+            var main = ps_waterSplash.main;
+            //Set particle color to gradient;
+            main.startColor = gradient;
+
+        }
+    }
 }
+
 ```
 
 </details>
