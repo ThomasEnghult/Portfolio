@@ -621,7 +621,7 @@ public class Liquid : MonoBehaviour
 <table>
   <tr>
     <td style="width:50%;text-align:left;vertical-align:top">The hammer uses two scripts, <br> Crusher.cs and Crushable.cs.<br><br>
-Adding the Crusher script to a GameObject <br> allows it to crush, and the Crushable script <br> allows it to be crushed by the Crusher. <br> The particle effect looks at the material color of crushable object to match the color. </td>
+Adding the Crusher script to a GameObject <br> allows it to crush, and the Crushable script <br> allows it to be crushed by the Crusher. <br> The particle effect looks at the material color <br> of crushable object to match the color. </td>
     <td><img src="Images\MrA_Hammer.gif" width="100%" /></td>
   </tr>
 </table>
