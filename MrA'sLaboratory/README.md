@@ -875,11 +875,13 @@ public class Crushable : MonoBehaviour
 
 <table>
   <tr>
-    <td style="width:50%;text-align:left;vertical-align:top">The blowtorch uses two scripts, Blowtorch.cs and Torchable.cs.<br><br> Adding Torchable to any GameObject allows it to be torched, changing the color of the object and enables the object to break. <br><br> I create the "glow effect" by changing the <a href="https://en.wikipedia.org/wiki/HSL_and_HSV">HSV</a>
-of the material, reducing saturation and increasing the value. For transparent materials I had to increase the transparency to compensate for the brighter colors. </td>
+    <td style="width:50%;text-align:left;vertical-align:top">The blowtorch uses two scripts, Blowtorch.cs and Torchable.cs.<br><br> Adding Torchable to any GameObject allows it to be torched, changing the color of the object and enables the object to break. </td>
     <td><img src="Images\MrA_Blowtorch.gif" width="100%" /></td>
   </tr>
 </table>
+
+I create the "glow effect" by changing the <a href="https://en.wikipedia.org/wiki/HSL_and_HSV">HSV</a>
+of the material, reducing saturation and increasing the value. For transparent materials I had to increase the transparency to compensate for the brighter colors. 
 
 <details>
 <summary>Blowtorch</summary>
