@@ -1077,12 +1077,10 @@ public class Torchable : MonoBehaviour
 
 <table>
   <tr>
-    <td style="width:50%;text-align:left;vertical-align:top">The mortar and pestle had considerably more issues containing clean code due to the interactions with the XR Toolkit requiring workarounds.</td>
+    <td style="width:50%;text-align:left;vertical-align:top">The mortar and pestle had considerably more issues containing clean code due to the interactions with the XR Toolkit requiring workarounds. you can grind a gem down using the pestle, taking into account the circular motion for added efficiency.</td>
     <td><img src="Images\MrA_Mortar.gif" width="100%" /> </td>
   </tr>
 </table>
-
-If the mortar's socket contains a gem, you can grind it down using the pestle, taking into account the circular motion for added efficiency.
 
 <details>
 <summary>Mortar</summary>
