@@ -13,8 +13,12 @@ Team: 3 Programmers and 4 Artists
 
 <table>
   <tr>
-    <td><img src="Images\DustyDeliveries_01.png" /></td>
-    <td><img src="Images\DustyDeliveries_02.png" /></td>
+    <td width="50%"><img src="Images\MrA_Mixing.png" /></td>
+    <td width="50%"><img src="Images\MrA_Crushing.png" /></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="Images\MrA_Scanning.png" /></td>
+    <td width="50%"><img src="Images\MrA_Dispensers.png" /></td>
   </tr>
 </table>
 
