@@ -1,8 +1,8 @@
 # *Mr A's Laboratory*
 
-<img src="Images\EOTM_menu.jpg" width="100%"/>
+<img src="Images\MrA_Transfer.gif" width="100%"/>
 
-[Itch.io page](https://yrgo-game-creator.itch.io/employee-of-the-month)  
+[Itch.io page](https://yrgo-game-creator.itch.io/mr-a-vr)  
 
 [Repository Link](https://github.com/Proliix/VrGrupp7)  
 
@@ -22,7 +22,7 @@ Below is a summary of my code written to this game, keep in mind that this is a 
 
 ## - **Liquid Simulation**  
 
- <img src="Images\MrA_LiquidDemo.gif" alt="Liquid Simulation" width="100%">
+ <img src="Images\MrA_LiquidDemo.gif" alt="Liquid Simulation">
 
 
 To emulate a liquid simulation I used [Spline Mesh](https://assetstore.unity.com/packages/tools/modeling/splinemesh-104989) from the Unity Asset store based on this [tutorial](https://www.youtube.com/watch?v=3CcWus6d_B8) that helped me get started.  
@@ -77,6 +77,9 @@ public class PourLiquid : MonoBehaviour
     private float maxPourStrength = 2;
     private float PourStrength = 2f;
 
+    //This can be used to allow liquid to pour through objects;
+    [SerializeField] private LayerMask PourCollisionMask;
+
     [Header("Display Controls")]
     [SerializeField]
     [Range(10, 100)]
@@ -87,31 +90,24 @@ public class PourLiquid : MonoBehaviour
 
     public int pointCount;
 
-    float pourStrengthLimiter = 1;
-
-    float liquidLost = 0;
-
-    //This can be used to allow liquid to pour through objects;
-    [SerializeField] private LayerMask PourCollisionMask;
-
-    bool isPouring;
-
+    private float pourStrengthLimiter = 1;
+    private float liquidLost = 0;
+    private bool isPouring;
     private IEnumerator couroutine_Flowing;
 
+    [Header("If used as dispenser")]
     [SerializeField] private LiquidDispenser liquidDispenser;
 
     private void Awake()
     {
-
         splineTrajectory = new Vector3[LinePoints];
         currentTrajectory = new Vector3[LinePoints];
 
-
-        if(transform.parent != null)
+        if (transform.parent != null)
         {
             var dispenser = transform.parent.GetComponentInChildren<LiquidDispenser>();
 
-            if(dispenser != null)
+            if (dispenser != null)
             {
                 liquidDispenser = dispenser;
             }
@@ -121,19 +117,16 @@ public class PourLiquid : MonoBehaviour
     IEnumerator Couroutine_StartFlow(Color color)
     {
         //Wait for a liquid from the object pool
-        while(liquid == null)
+        while (liquid == null)
         {
             liquid = LiquidObjectPool.instance.GetLiquid();
 
-             
+
             if (liquid == null)
                 yield return new WaitForSeconds(TimeBetweenPoints);
             else
                 Debug.Log(transform.name + " took " + liquid.transform.name + " from object pool");
         }
-
-
-        //Debug.Log("PourLiquid: " + liquid.transform.name + "Starting Flow");
 
         //set the liquids pourLiquid reference to this script
         liquid.pourLiquid = this;
@@ -154,13 +147,10 @@ public class PourLiquid : MonoBehaviour
             RecordPositions();
 
             //Sometimes is called after we cancel the couroutine
-            if(liquid != null)
+            if (liquid != null)
                 liquid.UpdateSpline();
         }
-
-
     }
-
 
     void RecordPositions()
     {
@@ -207,14 +197,12 @@ public class PourLiquid : MonoBehaviour
 
             Vector3 lastPosition = currentTrajectory[i - 1];
 
-            bool collided = Physics.Raycast(lastPosition, point - lastPosition, out RaycastHit hit, (point - lastPosition).magnitude, PourCollisionMask);
+            bool collided = Physics.Raycast(lastPosition, point - lastPosition, out RaycastHit hit, (point - lastPosition).magnitude, PourCollisionMask); //Add collision Mask?
 
             if (collided && hit.collider.gameObject != gameObject)
             {
-
                 currentTrajectory[i] = hit.point;
                 i++;
-
                 pointCount = i;
 
                 TryTransferLiquid(hit.collider.gameObject, time);
@@ -226,6 +214,7 @@ public class PourLiquid : MonoBehaviour
                     i++;
                 }
 
+                //DrawDebugLines(currentTrajectory, Color.white, TimeBetweenPoints * 5);
                 return;
             }
         }
@@ -233,6 +222,7 @@ public class PourLiquid : MonoBehaviour
 
     public void Pour(Color color)
     {
+        //Debug.Log("PourLiquid: Pour");
         couroutine_Flowing = Couroutine_StartFlow(color);
         StartCoroutine(couroutine_Flowing);
     }
@@ -241,10 +231,10 @@ public class PourLiquid : MonoBehaviour
     {
         isPouring = false;
         StopCoroutine(couroutine_Flowing);
-        
 
         if (liquid == null)
             return;
+        //Debug.Log("LiquidPour: Stopping " + liquid.transform.name);
 
         liquid.StopFlow();
     }
@@ -253,17 +243,29 @@ public class PourLiquid : MonoBehaviour
     {
         LiquidObjectPool.instance.ReturnLiquid(liquid);
         liquid = null;
-        if(this == null) { return;}
+        if (this == null) { return; }
         CancelInvoke();
 
         pourStrengthLimiter = 1;
+    }
+
+    void DrawDebugLines(Vector3[] points, Color color, float duration)
+    {
+        for (int i = 0; i < points.Length; i++)
+        {
+            if (points[i + 1] == Vector3.zero)
+                break;
+
+            Debug.DrawLine(points[i], points[i + 1], color, duration);
+
+        }
     }
 
     public void SetPourStrength(float tilt)
     {
         pourStrengthLimiter -= Time.deltaTime;
         //Magic numbers
-        PourStrength = Mathf.Clamp((tilt - 1) * pourStrengthGain, 0.1f, maxPourStrength - Mathf.Clamp01(pourStrengthLimiter)* (maxPourStrength / 3));
+        PourStrength = Mathf.Clamp((tilt - 1) * pourStrengthGain, 0.1f, maxPourStrength - Mathf.Clamp01(pourStrengthLimiter) * (maxPourStrength / 3));
     }
 
     public void UpdateLiquidLost(float lost)
@@ -274,8 +276,8 @@ public class PourLiquid : MonoBehaviour
     void TryTransferLiquid(GameObject hitObject, float delay)
     {
         LiquidCatcher liquidCatcher = hitObject.GetComponent<LiquidCatcher>();
-        
-        if(liquidCatcher != null && liquidDispenser != null)
+
+        if (liquidCatcher != null && liquidDispenser != null)
         {
             if (liquidCatcher.GetVolume() < 1)
             {
@@ -285,7 +287,7 @@ public class PourLiquid : MonoBehaviour
                 return;
             }
         }
-        else if(liquidCatcher != null)
+        else if (liquidCatcher != null)
         {
             if (liquidCatcher.GetVolume() < 1)
             {
@@ -295,7 +297,7 @@ public class PourLiquid : MonoBehaviour
                 return;
             }
         }
-        else if(hitObject.TryGetComponent(out CanHaveAttributes canHaveAttributes))
+        else if (hitObject.TryGetComponent(out CanHaveAttributes canHaveAttributes))
         {
             StartCoroutine(Couroutine_TransferAttributes(canHaveAttributes, liquidLost, delay));
             Invoke(nameof(PlayParticle), delay);
@@ -324,12 +326,22 @@ public class PourLiquid : MonoBehaviour
         canHaveAttributes.AddAttributes(gameObject, liquidLost);
     }
 
+    void PlayParticle()
+    {
+        liquid.ps_waterSplash.Play();
+    }
+
+    void StopParticle()
+    {
+        liquid.ps_waterSplash.Stop();
+    }
+
     private void OnDisable()
     {
         if (isPouring)
         {
             Debug.Log("PourLiquid Disabled: Stopping pour on " + transform.name);
-            Stop(); 
+            Stop();
         }
     }
 }
@@ -357,20 +369,20 @@ public class Liquid : MonoBehaviour
 
     [SerializeField] float speedDelta;
     [SerializeField] float animationSpeed;
-    private float localAnimSpeed;
+    [SerializeField] private float maxSpeed = 10f;
 
     private Vector3 targetScale;
+    private float localAnimSpeed;
     private float speedCurveLerp;
     private float length;
 
     private Vector3 startScale;
     private float meshLength;
-    [SerializeField] private float maxSpeed = 10f;
     private bool flowWater = true;
 
     public ParticleSystem ps_waterSplash;
-    Vector3 impactPos;
-    Vector3 impactUp;
+    private Vector3 impactPos;
+    private Vector3 impactUp;
 
     public void StartFlow(Color color)
     {
@@ -425,7 +437,6 @@ public class Liquid : MonoBehaviour
 
     IEnumerator Coroutine_WaterFlow()
     {
-        //Debug.Log(gameObject.name + ": Flow Started");
         while (flowWater)
         {
             //Moves the mesh along the spline by scaling it, targetScale updates depending on the length of the spline
@@ -448,15 +459,15 @@ public class Liquid : MonoBehaviour
             yield return null;
         }
 
-        float count = 0;
+        float contortLength = 0;
         speedCurveLerp = 0;
 
-        while (count < spline.Length)
+        while (contortLength < spline.Length)
         {
             //Retracts the splineMesh along the spline
-            contortAlong.Contort((count / spline.Length));
+            contortAlong.Contort((contortLength / spline.Length));
 
-            count += Time.deltaTime * localAnimSpeed * speedCurveLerp;
+            contortLength += Time.deltaTime * localAnimSpeed * speedCurveLerp;
             speedCurveLerp = Mathf.Clamp(speedCurveLerp + speedDelta * Time.deltaTime, 0, maxSpeed);
             yield return null;
 
@@ -469,8 +480,6 @@ public class Liquid : MonoBehaviour
     }
     private void ConfigureSpline()
     {
-        Vector3[] points = pourLiquid.splineTrajectory;
-
         Vector3 targetDirection = (pourLiquid.transform.up);
         transform.forward = new Vector3(targetDirection.x, 0, targetDirection.z).normalized;
 
@@ -485,10 +494,7 @@ public class Liquid : MonoBehaviour
 
     public void UpdateSpline()
     {
-        if (!flowWater)
-        {
-            return;
-        }
+        if (!flowWater) { return; }
 
         Vector3[] points = pourLiquid.splineTrajectory;
 
@@ -564,13 +570,11 @@ public class Liquid : MonoBehaviour
             Vector3 normal = Quaternion.Euler(myAngle) * myAngle;
             Vector3 direction = point - (normal / 2f);
 
-
             spline.nodes[nodeCount].Position = transform.InverseTransformPoint(point);
             spline.nodes[nodeCount].Direction = transform.InverseTransformPoint(direction);
         }
 
         RemoveUnusedSplines(nodeCount);
-
         UpdateScale();
     }
 
@@ -579,8 +583,6 @@ public class Liquid : MonoBehaviour
         for (int i = spline.nodes.Count - 1; i > nodeCount - 1; i--)
         {
             spline.RemoveNode(spline.nodes[i]);
-            //Debug.Log("points: " + line.positionCount);
-            //Debug.Log("Removing node: " + i);
         }
     }
 
@@ -600,7 +602,362 @@ public class Liquid : MonoBehaviour
             var main = ps_waterSplash.main;
             //Set particle color to gradient;
             main.startColor = gradient;
+        }
+    }
+}
+```
 
+</details>
+
+---
+
+## - **Tools**  
+
+ <img src="Images\MrA_Tools.png" alt="Liquid Simulation">
+
+
+### Hammer
+
+<table>
+  <tr>
+    <td style="width:50%;text-align:left;vertical-align:top">The hammer uses two scripts, Crusher.cs and Crushable.cs.<br><br>
+Adding the Crusher script to a GameObject allows it to crush, and the Crushable script allows it to be crushed by the Crusher. <br> The particle effect looks at the material color of crushable object to match the color. </td>
+    <td><img src="Images\MrA_Hammer.gif" /></td>
+  </tr>
+</table>
+
+<details>
+<summary>Crusher</summary>
+
+ ```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+
+[RequireComponent(typeof(Rigidbody))]
+public class Crusher : MonoBehaviour
+{
+    [Header("Crusher settings")]
+    [SerializeField] private Transform hammerHead;
+    [SerializeField] private float sharpness = 1;
+    private float damage;
+
+    [Header("Sound Controls")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField][Range(0, 1)] private float volumeModifier = 1;
+    [SerializeField] [Range(0, 1)] private float maxVolume = 1;
+    private float soundCooldownTime = 0.1f;
+    private bool soundCooldown = false;
+
+    private Vector3 oldPosition;
+    private Rigidbody rb;
+
+    void Start()
+    {
+        if (hammerHead == null)
+            hammerHead = transform;
+
+        rb = GetComponent<Rigidbody>();
+        oldPosition = hammerHead.position;
+    }
+
+    void Update()
+    {
+        if (!rb.IsSleeping())
+        {
+            damage = GetForce();
+            oldPosition = hammerHead.position;
+        }
+    }
+
+    float GetForce()
+    {
+        return (hammerHead.position - oldPosition).magnitude / Time.deltaTime;
+    }
+
+    public float GetDamage()
+    {
+        if (rb.IsSleeping())
+        {
+            Debug.Log("Crusher is not moving: dealing 0 damage");
+            return 0;
+        }
+
+        return damage * sharpness;
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.transform.TryGetComponent(out ParentCrushable parentCrushable))
+        {
+            parentCrushable.CollidedWithCrusher(other, GetDamage(), hammerHead.position);
+            //Debug.Log("Crusher dealt " + GetDamage() + " Damage to " + other.transform.name);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.TryGetComponent(out Crushable crushable))
+        {
+            float damage = GetDamage();
+            PlaySound(crushable.clip_soundWhenHit, damage);
+            crushable.OnCollision(damage, other.ClosestPoint(hammerHead.position), hammerHead.position);
+        }
+    }
+
+    private void PlaySound(AudioClip clip, float damage)
+    {
+        if(audioSource == null) { return; }
+
+        if (soundCooldown) { return; }
+
+        StartCoroutine(PlaySoundCooldown(soundCooldownTime));
+
+        if (clip == null)
+            clip = audioSource.clip;
+
+        audioSource.volume = Mathf.Clamp(damage * volumeModifier, 0, maxVolume);
+        audioSource.PlayOneShot(clip, damage);
+    }
+
+    private IEnumerator PlaySoundCooldown(float time)
+    {
+        soundCooldown = true;
+
+        yield return new WaitForSeconds(time);
+
+        soundCooldown = false;
+    }
+}
+
+```
+</details>
+
+<details>
+<summary>Crushable</summary>
+
+ ```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(Collider))]
+public class Crushable : MonoBehaviour
+{
+    public AudioClip clip_soundWhenHit;
+    public AudioClip clip_soundWhenCrushed;
+
+    [SerializeField] private GameObject[] detatchOnDestroy;
+
+    [HideInInspector] 
+    public float startHealth;
+    public float currentHealth;
+    [SerializeField] 
+    private float heatModifier = 3f;
+
+    bool isInvincible = false;
+    float invincibleAfterHitTime = 0.1f;
+
+    public GameObject ParticleOnHit;
+
+    [Header("Put this color to match the color of the object, remember to put alpha to 1!")]
+    [SerializeField] private Color baseColor;
+    //This value controls on how much the color varies from the base color, 0 means all particles have same color as base;
+    public float particleColorGradient = 0.5f;
+
+
+    void Start()
+    {
+        startHealth = currentHealth;
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        //Debug.Log("Crushable Collided with " + other.transform.name);
+
+        if (other.transform.TryGetComponent(out Crusher crusher))
+        {
+            OnCollision(crusher.GetDamage() ,other.GetContact(0).point, other.collider.bounds.center);
+        }
+    }
+
+    public void OnCollision(float damage, Vector3 hitLocation, Vector3 crusherLocation)
+    {
+        if (!isInvincible)
+        {
+            LoseHealth(damage);
+
+            StartCoroutine(Invincible(invincibleAfterHitTime));
+
+            SpawnParticleEffect(damage, hitLocation, crusherLocation);
+        }
+    }
+
+
+    public void LoseHealth(float damage)
+    {
+        if(TryGetComponent(out Torchable torchable))
+        {
+            damage *= 1 + torchable.GetTemperature() * heatModifier;
+        }
+
+        currentHealth -= damage;
+
+        if(currentHealth < 0)
+        {
+            Crush();
+        }
+    }
+
+    void Crush()
+    {
+        foreach(GameObject obj in detatchOnDestroy)
+        {
+            if(obj == null) { continue; }
+
+            obj.transform.parent = null;
+
+            if(obj.TryGetComponent(out AddGrab addGrab))
+            {
+                addGrab.Add();
+            }
+        }
+
+        if(clip_soundWhenCrushed != null)
+        {
+            AudioSource.PlayClipAtPoint(clip_soundWhenCrushed, transform.position, 0.5f);
+        }
+
+        Destroy(gameObject);
+    }
+
+    private IEnumerator Invincible(float time)
+    {
+        isInvincible = true;
+        yield return new WaitForSeconds(time);
+        isInvincible = false;
+    }
+
+    private void SpawnParticleEffect(float damage, Vector3 hitLocation, Vector3 crusherLocation)
+    {
+        //Spawn particle
+        GameObject particle = Instantiate(ParticleOnHit, hitLocation, Quaternion.identity);
+
+        particle.transform.localScale = Vector3.one * Mathf.Clamp(damage, 0, 1);
+
+        //Get Color of our gameobject
+        var color = GetComponent<Renderer>().material.color;
+
+        if(baseColor != Color.clear)
+        {
+            color *= baseColor;
+        }
+        //Create a light/dark gradient from our gameobject color
+        var gradient = new ParticleSystem.MinMaxGradient(color * (1 - particleColorGradient), color * (1 + particleColorGradient));
+        var main = particle.GetComponent<ParticleSystem>().main;
+        //Set particle color to gradient;
+        main.startColor = gradient;
+
+        //Rotate the particle effect to the impact direction
+        particle.transform.up = crusherLocation - hitLocation;
+        //Destroy after 1 second;
+        Destroy(particle, 1);
+    }
+}
+
+```
+</details>
+
+---
+
+### Bloworch
+
+<table>
+  <tr>
+    <td style="width:50%;text-align:left;vertical-align:top">The blowtorch uses two scripts, Blowtorch.cs and Torchable.cs.<br><br> Adding Torchable to any GameObject allows it to be torched, changing the color of the object and enables the object to break. <br><br> I create the "glow effect" by changing the <a href="https://en.wikipedia.org/wiki/HSL_and_HSV">HSV</a>
+of the material, reducing saturation and increasing the value. For transparent materials I had to increase the transparency to compensate for the brighter colors. </td>
+    <td><img src="Images\MrA_Blowtorch.gif" /></td>
+  </tr>
+</table>
+
+<details>
+<summary>Blowtorch</summary>
+
+ ```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Blowtorch : MonoBehaviour
+{
+    [SerializeField] ParticleSystem fire;
+    private List<Torchable> insideTorch = new List<Torchable>();
+
+    private bool isActive = false;
+
+    [SerializeField] AudioClip start;
+    [SerializeField] AudioClip loop;
+
+    private AudioSource audioSource;
+
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
+    public void StartTorch()
+    {
+        fire.Play();
+        isActive = true;
+
+        audioSource.PlayOneShot(start);
+        audioSource.clip = loop;
+        audioSource.PlayDelayed(start.length - 0.5f);
+
+        for (int i = 0; i < insideTorch.Count; i++)
+        {
+            insideTorch[i].OnTorchEnter();
+        }
+    }
+
+    public void StopTorch()
+    {
+        fire.Stop();
+        isActive = false;
+
+        audioSource.Stop();
+
+        for (int i = 0; i < insideTorch.Count; i++)
+        {
+            if (insideTorch[i] == null)
+            {
+                continue;
+            }
+            insideTorch[i].OnTorchExit();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+
+        if (other.TryGetComponent(out Torchable torchable))
+        {
+            if (!insideTorch.Contains(torchable))
+                insideTorch.Add(torchable);
+
+            if (isActive)
+                torchable.OnTorchEnter();
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.TryGetComponent(out Torchable torchable))
+        {
+            insideTorch.Remove(torchable);
+
+            torchable.OnTorchExit();
         }
     }
 }
@@ -609,7 +966,275 @@ public class Liquid : MonoBehaviour
 
 </details>
 
+<details>
+<summary>Torchable</summary>
+
+ ```csharp
+using UnityEngine;
+using UnityEngine.Events;
+
+public class Torchable : MonoBehaviour
+{
+    public UnityEvent onBreak;
+    private bool isBroken = false;
+
+    [Header("Defaults to this gameobject")]
+    [SerializeField] public GameObject torchedObject;
+
+    [Header("Heat Controls")]
+    [SerializeField] private float heatGainSpeed = 0.5f;
+    [SerializeField] private float heatLossSpeed = 0.2f;
+    [SerializeField] private float maxTemp = 1.5f;
+    [SerializeField] private float breakTemp = 1.5f;
+
+    [Header("Color Change Controls (Default color is red)")]
+    [SerializeField] public Color maxTorchedColor;
+    [SerializeField] private float saturationModifier = 0.2f;
+    [SerializeField] private float valueModifier = 1;
+
+    private Material material;
+    private Color original;
+
+    private float temp01 = 0;
+    private bool insideFire = false;
+
+    void Start()
+    {
+        if (torchedObject == null)
+            torchedObject = gameObject;
+
+        if (maxTorchedColor == Color.clear)
+            maxTorchedColor = Color.red;
+
+        material = torchedObject.GetComponent<Renderer>().material;
+        original = material.color;
+
+        //Debug.Log(gameObject.name +  " has Mat: " + material.name);
+        this.enabled = false;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        temp01 = insideFire ?
+            temp01 + Time.deltaTime * heatGainSpeed :
+            temp01 - Time.deltaTime * heatLossSpeed;
+
+        temp01 = Mathf.Clamp(temp01, 0, maxTemp);
+
+        if (temp01 >= breakTemp && !isBroken)
+        {
+            isBroken = true;
+            onBreak.Invoke();
+        }
+
+        if (temp01 <= 0)
+        {
+            temp01 = 0;
+            material.color = original;
+            this.enabled = false;
+        }
+
+        Color.RGBToHSV(original, out float hue, out float saturation, out float value);
+        Color.RGBToHSV(maxTorchedColor, out float maxH, out float MaxS, out float MaxV);
+
+        hue = Mathf.Lerp(hue, maxH, temp01);
+        saturation = Mathf.Lerp(saturation, MaxS, temp01);
+        value = Mathf.Lerp(value, MaxV, temp01);
+        float alpha = Mathf.Lerp(original.a, (original.a / 4f), temp01);
+
+        Color newColor = Color.HSVToRGB(hue, saturation - (temp01 * saturationModifier), value * (1 + temp01) * valueModifier);
+        newColor.a = alpha;
+
+        material.color = newColor;
+        //Debug.Log(material.name + " has temp: " + temp01 + " and color " + material.color + ". Target color: " + newColor);
+    }
+
+    public void OnTorchEnter()
+    {
+        this.enabled = true;
+        insideFire = true;
+    }
+
+    public void OnTorchExit()
+    {
+        insideFire = false;
+    }
+    public float GetTemperature()
+    {
+        return temp01;
+    }
+}
+
+```
+</details>
+
 ---
 
-## - **Adding Juice**
+### Mortar & Pestle
+
+<table>
+  <tr>
+    <td style="width:50%;text-align:left;vertical-align:top">The mortar and pestle had considerably more issues containing clean code due to the interactions with the XR Toolkit requiring workarounds. If the mortar's socket contains a gem, you can grind it down using the pestle, taking into account the circular motion for added efficiency.</td>
+    <td><img src="Images\MrA_Mortar.gif"/> </td>
+  </tr>
+</table>
+
+<details>
+<summary>Mortar</summary>
+
+ ```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+
+public class Mortar : MonoBehaviour
+{
+    [SerializeField] private GameObject dustPrefab;
+    [SerializeField] private Transform dustSpawnpoint;
+    [SerializeField] private GameObject heldObject;
+
+    private GameObject currentDust;
+    private XRSocketInteractor socket;
+
+    private Vector3 heldObjectOriginalScale;
+    private Vector3 dustOriginalScale;
+    private float lerpScale = 0;
+
+    private Pestle pestle;
+    private Crushable crushable;
+
+    void Start()
+    {
+        dustOriginalScale = dustPrefab.transform.localScale;
+        socket = GetComponentInChildren<XRSocketInteractor>();
+
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent(out Pestle pestle))
+        {
+            this.pestle = pestle;
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if(other.GetComponent<Pestle>() == null) { return; }
+        if(heldObject == null) { return; }
+        if(crushable == null && !heldObject.TryGetComponent(out crushable)) { return; }
+
+        float damage = pestle.GetDamage(dustSpawnpoint.position);
+        float percentageLost = damage / crushable.startHealth;
+
+        foreach (BaseAttribute attribute in heldObject.GetComponents<BaseAttribute>())
+        {
+            BaseAttribute dustAttribute = (BaseAttribute)currentDust.GetComponent(attribute.GetType());
+            if(dustAttribute == null)
+            {
+                dustAttribute = attribute.AddToOther(currentDust.transform);
+            }
+
+            dustAttribute.mass += attribute.mass * percentageLost;
+        }
+
+        crushable.LoseHealth(damage);
+
+        lerpScale += percentageLost;
+        IncreaseDustSize();
+    }
+
+    public void SocketCheck()
+    {
+        IXRSelectInteractable objName = socket.GetOldestInteractableSelected();
+        heldObject = objName.transform.gameObject;
+        heldObject.transform.localScale = heldObjectOriginalScale;
+
+        SpawnDust();
+    }
+
+    public void SocketClear()
+    {
+        if(crushable != null && crushable.currentHealth <= 0)
+        {
+            ReleaseDust();
+        }
+
+        heldObject = null;
+        crushable = null;
+        Debug.Log("Socket Cleared");
+    }
+
+    void SpawnDust()
+    {
+        if(currentDust != null) { return; }
+
+        currentDust = Instantiate(dustPrefab, dustSpawnpoint);
+        currentDust.transform.localScale = Vector3.zero;
+
+        foreach (Collider col in currentDust.GetComponents<Collider>())
+            col.enabled = false;
+
+        currentDust.GetComponent<Rigidbody>().isKinematic = true;
+
+        Color color = heldObject.GetComponent<Renderer>().material.color;
+        currentDust.GetComponentInChildren<Renderer>().material.SetColor("_Color", color);
+
+        lerpScale = 0;
+
+        if  (heldObject.TryGetComponent(out Torchable heldTorchable) &&
+            currentDust.TryGetComponent(out Torchable dustTorchable))
+        {
+            dustTorchable.maxTorchedColor = heldTorchable.maxTorchedColor;
+        }
+    }
+
+    void IncreaseDustSize()
+    {
+        if (currentDust == null) { return; }
+
+        float xScale = Mathf.Clamp(lerpScale, 0, dustOriginalScale.x);
+        float zScale = Mathf.Clamp(lerpScale, 0, dustOriginalScale.z);
+
+        float yScale = Mathf.Lerp(0, dustOriginalScale.y, lerpScale);
+        Vector3 newScale = new Vector3(xScale, yScale, zScale);
+
+        currentDust.transform.localScale = newScale;
+
+        if(lerpScale >= 1)
+        {
+            ReleaseDust();
+            SpawnDust();
+        }
+    }
+
+    void ReleaseDust()
+    {
+        currentDust.transform.parent = null;
+        currentDust.transform.position += (currentDust.transform.up * 0.15f);
+
+        foreach (Collider col in currentDust.GetComponents<Collider>())
+            col.enabled = true;
+
+        currentDust.GetComponent<Rigidbody>().isKinematic = false;
+        currentDust.GetComponent<AddGrab>().Add();
+        currentDust = null;
+    }
+}
+
+```
+</details>
+
+<details>
+<summary>Pestle</summary>
+
+ ```cs
+
+```
+
+</details>
+
+---
 
