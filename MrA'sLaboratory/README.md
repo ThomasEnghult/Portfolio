@@ -621,7 +621,7 @@ public class Liquid : MonoBehaviour
 <table>
   <tr>
     <td style="width:50%;text-align:left;vertical-align:top">The hammer uses two scripts, <br> Crusher.cs and Crushable.cs.<br><br>
-Adding the Crusher script to a GameObject <br> allows it to crush, and the Crushable script <br> allows it to be crushed by the Crusher. <br> The particle effect looks at the material color of crushable object to match the <br> color. </td>
+Adding the Crusher script to a GameObject <br> allows it to crush, and the Crushable script <br> allows it to be crushed by the Crusher. <br> The particle effect looks at the material color of crushable object to match the color. </td>
     <td><img src="Images\MrA_Hammer.gif" width="100%" /></td>
   </tr>
 </table>
@@ -1076,7 +1076,7 @@ public class Torchable : MonoBehaviour
 
 <table>
   <tr>
-    <td style="width:50%;text-align:left;vertical-align:top">The mortar and pestle had considerably <br> more issues containing clean code due <br> to the interactions with the XR Toolkit <br> requiring workarounds. you can grind a gem down <br> using the pestle, taking into account the <br> circular motion for added efficiency.</td>
+    <td style="width:50%;text-align:left;vertical-align:top">The mortar and pestle had considerably <br> more issues containing clean code due <br> to the interactions with the XR Toolkit <br> requiring workarounds. you can grind <br> a gem down  using the pestle, taking into account <br> the circular motion for added efficiency.</td>
     <td><img src="Images\MrA_Mortar.gif" width="100%" /> </td>
   </tr>
 </table>
