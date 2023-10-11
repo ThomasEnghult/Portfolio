@@ -620,8 +620,8 @@ public class Liquid : MonoBehaviour
 
 <table>
   <tr>
-    <td style="width:50%;text-align:left;vertical-align:top">The hammer uses two scripts, <br> Crusher.cs and Crushable.cs.<br><br>
-Adding the Crusher script to a GameObject <br> allows it to crush, and the Crushable script <br> allows it to be crushed by the Crusher. <br> The particle effect looks at the material color <br> of crushable object to match the color. </td>
+    <td width="50%" valign="top" text-align="left">The hammer uses two scripts, Crusher.cs and Crushable.cs.<br><br>
+Adding the Crusher script to a GameObject allows it to crush, and the Crushable script allows it to be crushed by the Crusher. The particle effect looks at the material color of crushable object to match the color. </td>
     <td><img src="Images\MrA_Hammer.gif" width="100%" /></td>
   </tr>
 </table>
@@ -875,8 +875,8 @@ public class Crushable : MonoBehaviour
 
 <table>
   <tr>
-    <td style="width:50%;text-align:left;vertical-align:top">The blowtorch uses two scripts, <br> Blowtorch.cs and Torchable.cs.<br><br> Adding Torchable to any GameObject <br> allows it to be torched, changing the color <br> of the object and enables the object to break. <br> I create the "glow effect" by changing the <br> <a href="https://en.wikipedia.org/wiki/HSL_and_HSV">HSV</a>
-of the material, reducing saturation <br> and increasing the value. For transparent <br> materials I had to increase the  <br>transparency to compensate for the <br> brighter colors.  </td>
+    <td width="50%" valign="top" text-align="left">The blowtorch uses two scripts, Blowtorch.cs and Torchable.cs.<br><br> Adding Torchable to any GameObject allows it to be torched, changing the color of the object and enables the object to break. I create the "glow effect" by changing the <a href="https://en.wikipedia.org/wiki/HSL_and_HSV">HSV</a>
+of the material, reducing saturation and increasing the value. For transparent materials I had to increase the  transparency to compensate for the brighter colors.  </td>
     <td><img src="Images\MrA_Blowtorch.gif" width="100%" /></td>
   </tr>
 </table>
@@ -1076,7 +1076,7 @@ public class Torchable : MonoBehaviour
 
 <table>
   <tr>
-    <td style="max-width:50; text-align:left;vertical-align:top">The mortar and pestle had considerably <br> more issues containing clean code due <br> to the interactions with the XR Toolkit <br> requiring workarounds. you can grind <br> a gem down  using the pestle, taking into <br> account the circular motion for added <br> efficiency.</td>
+    <td width="50%" valign="top" text-align="left">The mortar and pestle had considerably <br> more issues containing clean code due <br> to the interactions with the XR Toolkit <br> requiring workarounds. you can grind <br> a gem down  using the pestle, taking into <br> account the circular motion for added <br> efficiency.</td>
     <td><img src="Images\MrA_Mortar.gif" width="100%" /> </td>
   </tr>
 </table>
