@@ -1076,7 +1076,7 @@ public class Torchable : MonoBehaviour
 
 <table>
   <tr>
-    <td width="35%" valign="top" text-align="left">The mortar and pestle had considerably more issues containing clean code due to the interactions with the XR Toolkit requiring workarounds. <br> For Example, the XR Socket locks the transform of attached item, making you unable to alter its scale.<br><br> You can grind a gem down  using the pestle, taking into account the circular motion for added efficiency.</td>
+    <td width="35%" valign="top" text-align="left">The mortar and pestle had considerably more issues containing clean code due to the interactions with the XR Toolkit requiring workarounds. <br><br> For Example, the XR Socket locks the transform of attached item, making you unable to alter its scale.<br><br> You can grind a gem down  using the pestle, taking into account the circular motion for added efficiency.</td>
     <td><img src="Images\MrA_Mortar.gif" width="100%" /> </td>
   </tr>
 </table>
@@ -1239,3 +1239,462 @@ public class Mortar : MonoBehaviour
 
 ---
 
+## - **Potion Attributes**  
+
+<img src="Images\MrA_Transfer.gif" width="100%"/>
+
+To be able to mix different attributes I used the [concentration formula](https://en.wikipedia.org/wiki/Mass_concentration_(chemistry)) C = Mass/Volume and assigned a mass to each attribute that is used to calculate the potency of the effect.
+
+The potency is also modified by a mix percentage depending on how much of the mass have mixed with the volume.
+
+To handle all the transfers of attributes I created an abstract class for all attributes that handles all calculations.
+
+[Link to all attributes folder](https://github.com/Proliix/VrGrupp7/tree/main/VrGrupp7/Assets/Scripts/Attributes) 
+
+<details>
+<summary>BaseAttribute</summary>
+
+ ```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public abstract class BaseAttribute : MonoBehaviour, IScannable, IAttribute
+{
+    private LiquidContainer liquidContainer;
+
+    public float potency { get { return GetPotency(); } }
+
+    public float mass = 0;
+    //How mixed the mass is
+    [Range(0, 1f)] 
+    public float mixed01 = 0;
+
+    private float maxPotency = 1;
+    private PotionColor color;
+
+    private void Awake()
+    {
+        color = PotionColors.GetColor(this);
+
+        if (GetComponent<LiquidContainer>() == null && GetComponent<CanHaveAttributes>() == null)
+        {
+            enabled = false;
+        }
+
+        if (TryGetComponent(out Shake shake))
+        {
+            shake.onShake.AddListener(Shake);
+        }
+    }
+
+    public void AddMass(float addMass)
+    {
+        AddMass(addMass, 0f);
+    }
+
+    public void AddMass(float addMass, float otherMixed)
+    {
+        if(addMass <= 0) { return; }
+
+        float otherMixedMass = addMass * otherMixed;
+        float mixedMass = mass * mixed01;
+        float combinedMixedMass = mixedMass + otherMixedMass;
+
+        mass += addMass;
+
+        mixed01 = Mathf.Clamp01(combinedMixedMass / mass);
+
+        if (enabled)
+            UpdateStats();
+    }
+
+    public void LoseMassAndMix(float lostMass)
+    {
+        if (lostMass <= 0) { return; }
+
+        if(lostMass > mass)
+        {
+            lostMass = mass;
+        }
+
+        mixed01 = Mathf.Clamp01(mixed01 - lostMass * 0.01f);
+
+        mass -= lostMass;
+
+        if (enabled)
+            UpdateStats();
+
+
+    }
+
+    public float LoseMass(float volume)
+    {
+        float lostMass = (GetConcentration() * 100) * volume;
+        mass -= lostMass;
+
+        if(enabled)
+            UpdateStats();
+
+        return lostMass;
+    }
+
+    public void TransferMass(BaseAttribute other, float volume)
+    {
+        float otherMixed = other.mixed01;
+        float lostMass = other.LoseMass(volume);
+
+        AddMass(lostMass, otherMixed);
+    }
+
+    public float GetPotency()
+    {
+        float volume = GetVolume();
+
+        if (volume == 0)
+            return 0;
+
+        float potency = ((mass*mixed01) * 0.01f) / volume;
+
+        //if (potency > 1 || potency < 0)
+        //    Debug.Log(transform.name + " has this potency" + potency + " from mass: " + mass + " and vol: " + volume);
+
+        return potency;
+    }
+
+    float GetVolume()
+    {
+        float volume = 1;
+        if (liquidContainer == null)
+        {
+            if (TryGetComponent(out liquidContainer))
+            {
+                volume = liquidContainer.GetLiquidVolume();
+            }
+        }
+        else
+            volume = liquidContainer.GetLiquidVolume();
+
+        return volume;
+    }
+
+    float GetConcentration()
+    {
+        float volume = GetVolume();
+
+        if (volume == 0)
+            return 0;
+
+        float concentration = (mass * 0.01f) / volume;
+
+        return concentration;
+    }
+    public void DispenserAddToOther(Transform other, float volume)
+    {
+        var type = GetType();
+        BaseAttribute otherComponent = (BaseAttribute)other.GetComponent(type);
+
+        if (otherComponent == null)
+        {
+            otherComponent = (BaseAttribute)other.gameObject.AddComponent(type);
+            otherComponent.OnComponentAdd(this);
+
+            Debug.Log("Adding " + type.Name + " to " + other.name);
+        }
+
+        otherComponent.AddMass(mass * volume, mixed01);
+    }
+
+
+    public void AddToOther(Transform other, float volume)
+    {
+        var type = GetType();
+        BaseAttribute otherComponent = (BaseAttribute)other.GetComponent(type);
+
+        if(otherComponent == null)
+        {
+            otherComponent = (BaseAttribute)other.gameObject.AddComponent(type);
+            otherComponent.OnComponentAdd(this);
+            Debug.Log("Adding " + type.Name + " to " + other.name);
+        }
+
+        otherComponent.TransferMass(this, volume);
+    }
+
+    public BaseAttribute AddToOther(Transform other)
+    {
+        var type = GetType();
+        BaseAttribute otherComponent = (BaseAttribute)other.GetComponent(type);
+
+        if (otherComponent == null)
+        {
+            otherComponent = (BaseAttribute)other.gameObject.AddComponent(type);
+            otherComponent.OnComponentAdd(this);
+        }
+
+        return otherComponent;
+    }
+
+    private void Shake(float shakeForce)
+    {
+        TryMix(shakeForce);
+    }
+
+    private void TryMix(float addedPercentage)
+    {
+        float newMixedvalue = mixed01 + addedPercentage;
+        float volume = GetVolume();
+
+        if (volume == 0)
+        {
+            mixed01 = 0;
+            return; 
+        }
+
+        float newPotency = ((mass * 0.01f) * newMixedvalue) / volume;
+
+        // Math to calculate max mixed value
+        // maxP = ((mass * maxMixedValue * 0.01 / volume)
+        // maxP*volume = (mass * 0.01 * maxMixedValue)
+        // maxP*volume / (mass * 0.01) = maxMixedValue
+
+        //Limit potency to not exceed maxPotency
+        if (newPotency > maxPotency)
+        {
+            newMixedvalue = (maxPotency * volume) / (mass * 0.01f);
+        }
+
+        mixed01 = Mathf.Clamp01(newMixedvalue);
+
+        //Debug.Log(name + " is " + Mathf.Round(mixed01 * 100) + "% mixed");
+
+        if(enabled)
+            UpdateStats();
+    }
+
+    public virtual void OnComponentAdd(BaseAttribute originalAttribute)
+    {
+
+    }
+
+    public virtual void UpdateStats()
+    {
+
+    }
+
+    public abstract string GetName();
+
+    public abstract string GetScanInformation();
+
+    public PotionColor GetColor()
+    {
+        color.SetWeight(mixed01);
+        return color;
+    }
+
+    public void TryUpdateColor()
+    {
+        if (TryGetComponent(out LiquidCatcher liquidCatcher))
+        {
+            liquidCatcher.UpdateColor();
+        }
+    }
+}
+
+```
+
+</details>
+
+<details>
+<summary>An implementation of BaseAttribute (Explosive)</summary>
+
+ ```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(Collider))]
+
+[AddComponentMenu("**Attributes**/Explosive")]
+public class Explosive : BaseAttribute
+{
+    [Range(0f, 0.5f)][SerializeField] 
+    private float maxForceRequiredToExplode = 0.5f;
+    public GameObject explosion;
+
+    private Rigidbody m_rb;
+    private float minimumExplodeThreshold = 0.05f;
+    private float invincibleAfterSpawnTime = 0.2f;
+    private bool isInvincible = true;
+
+    private Shake shake;
+
+    private void OnEnable()
+    {
+        isInvincible = true;
+        Invoke(nameof(TurnOffInvincible), invincibleAfterSpawnTime);
+
+        shake = GetComponent<Shake>();
+
+        if (shake == null)
+        {
+            shake = gameObject.AddComponent<Shake>();
+            shake.onShake = new UnityEngine.Events.UnityEvent<float>();
+        }
+
+        m_rb = GetComponent<Rigidbody>();
+        shake.onShake.AddListener(TryExplode);
+    }
+
+    void TryExplode(float force)
+    {
+        //If not held by player, return
+        if (!m_rb.isKinematic) { return; }
+
+        Debug.Log("Shakeforce = " + force + " required force: " + GetForceRequiredToExplode());
+
+        if(force > GetForceRequiredToExplode())
+        {
+            Explode();
+        }
+    }
+
+
+    public override void OnComponentAdd(BaseAttribute originalAttribute)
+    {
+        Explosive other = (Explosive)originalAttribute;
+        explosion = other.explosion;
+    }
+
+    float GetForceRequiredToExplode()
+    {
+        return Mathf.Max(maxForceRequiredToExplode * (1 - potency), minimumExplodeThreshold);
+    }
+
+    void Explode()
+    {
+        if(TryGetComponent(out GlassBreak glassBreak))
+        {
+            glassBreak.BreakBottle();
+        }
+
+        GameObject newExplosion = Instantiate(explosion, transform.position, Quaternion.identity);
+
+        if(gameObject.TryGetComponent(out Respawnable respawnable))
+        {
+            respawnable.Respawn();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        Destroy(newExplosion, 1);
+    }
+
+    public override string GetScanInformation()
+    {
+        string information = "Explosive: ";
+
+        if(potency > 0.8f)
+        {
+            information += "Very Unstable!";
+        }
+        else if (potency > 0.5f)
+        {
+            information += "Unstable";
+        }
+        else if(potency > 0.2f)
+        {
+            information += "Little Unstable";
+        }
+        else
+        {
+            information += "Stable";
+        }
+
+        return information;
+    }
+
+    public override string GetName()
+    {
+        return "Explosive";
+    }
+
+    private void TurnOffInvincible()
+    {
+        isInvincible = false;
+    }
+}
+
+```
+
+</details>
+
+### Color mixing
+
+An easy way to lerp colors where the target color could change mid-transformation is to use the Vector4.MoveTowards on the color, it works because a color is essentially a vector4 with R, G, B, A values.
+
+To get the target color taking the potency of each attribute into account we weight the attribute colors by their potency.
+
+<details>
+<summary>Color Mixing</summary>
+
+ ```cs
+        public static PotionColor GetMixedColor(BaseAttribute[] baseAttributes)
+    {
+        Color sideColor = waterSide * waterWeight;
+        Color topColor = waterTop * waterWeight;
+
+        float weight = waterWeight;
+
+        foreach (var baseAttribute in baseAttributes)
+        {
+            var color = baseAttribute.GetColor();
+            sideColor += color.GetSideColor();
+            topColor += color.GetTopColor();
+            weight += color.GetWeight();
+        }
+
+        sideColor /= weight;
+        topColor /= weight;
+
+        sideColor.a = 1;
+        topColor.a = 1;
+
+        return new PotionColor(sideColor, topColor);
+    }
+``` 
+ ```cs
+    public void UpdateColor()
+    {
+        targetColor = PotionColors.GetMixedColor(GetComponents<BaseAttribute>());
+
+        if (!isChangingColor)
+        {
+            StartCoroutine(LerpColor());
+        }
+    }
+
+    private IEnumerator LerpColor()
+    {
+        isChangingColor = true;
+        Color sideColor = liquid.GetSideColor();
+        Color topColor = liquid.GetTopColor();
+
+        while (topColor != targetColor.GetTopColor() || sideColor != targetColor.GetTopColor())
+        {
+            sideColor = Vector4.MoveTowards(sideColor, targetColor.GetSideColor(), Time.deltaTime * fadeSpeed);
+            topColor = Vector4.MoveTowards(topColor, targetColor.GetTopColor(), Time.deltaTime * fadeSpeed);
+
+            liquid.SetSideColor(sideColor);
+            liquid.SetTopColor(topColor);
+            yield return null;
+
+        }
+
+        isChangingColor = false;
+    }
+```
+
+</details>
