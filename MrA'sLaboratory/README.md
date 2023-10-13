@@ -2,7 +2,7 @@
 
 <img src="Images\MrA_Transfer.gif" width="100%"/>
 
-[Itch.io page](https://yrgo-game-creator.itch.io/mr-a-vr)  
+[Itch.io page (not yet up)](https://yrgo-game-creator.itch.io/)  
 
 [Repository Link](https://github.com/Proliix/VrGrupp7)  
 
