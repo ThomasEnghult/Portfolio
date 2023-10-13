@@ -22,7 +22,7 @@ Below is a summary of my code written to this game, keep in mind that this is a 
 
 ## - **Liquid Simulation**  
 
- <img src="Images\MrA_LiquidDemo.gif" alt="Liquid Simulation">
+ <img src="Images\MrA_LiquidDemo.gif" alt="Liquid Simulation" width=100%>
 
 
 To emulate a liquid simulation I used [Spline Mesh](https://assetstore.unity.com/packages/tools/modeling/splinemesh-104989) from the Unity Asset store based on this [tutorial](https://www.youtube.com/watch?v=3CcWus6d_B8) that helped me get started.  
