@@ -26,20 +26,20 @@ I came across this [tutorial](https://www.youtube.com/watch?v=GJ9Y9Z6Axss) about
 
 <table>
   <tr>
-     <td width="35%" valign="top" text-align="left"> This shows the boat travelling forward without any stabilizing effects, just hovering above ground being pushed forward by the thrusters and sideways by gravity </td>
+     <td width="20%" valign="top" text-align="left"> This shows the boat travelling forward without any stabilizing effects, just hovering above ground being pushed forward by the thrusters and sideways by gravity </td>
     <td ><img src="Images\DustyDeliveries_NoStabilizer.gif" /> <i>No stabilizer</td>
   </tr>
     <tr>
-     <td width="35%" valign="top" text-align="left"> Enabling the <b> Lateral Stabilizer </b> shows significant improvement, but it still has major flaws. It keeps going off course and also tipping over due to the back hovers still having contact with the ground for a split second after jumping, causing the boat to pitch down.   </td>
+     <td width="20%" valign="top" text-align="left"> Enabling the <b> Lateral Stabilizer </b> shows significant improvement, but it still has major flaws. It keeps going off course and also tipping over due to the back hovers still having contact with the ground for a split second after jumping, causing the boat to pitch down.   </td>
     <td ><img src="Images\DustyDeliveries_LateralStabilizer.gif" /> <i>With Lateral stabilizer</td> 
   </tr>
       <tr>
-     <td width="35%" valign="top" text-align="left"> To keep it from spinning out of control, I added a <b> Yaw Stabilizer</b>. This keeps the boats course straight. But we still have the problem of the boat tipping over causing hard crashes into the sand. </td>
+     <td width="20%" valign="top" text-align="left"> To keep it from spinning out of control, I added a <b> Yaw Stabilizer</b>. This keeps the boats course straight. But we still have the problem of the boat tipping over causing hard crashes into the sand. </td>
     <td ><img src="Images\DustyDeliveries_YawStabilizer.gif" /> <i>With Lateral stabilizer and Yaw Stabilizer</td>
   </tr>
     </tr>
       <tr>
-     <td width="35%" valign="top" text-align="left"> Finally, I added an <b> Air Stabilizer </b> that tries to keep the boat upright. Also to handle the rough landings this component looks at the grounds normal and tries to align accordingly. It does this by projecting each hover components distance to a plane, then feeding the error into a <a href="https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller">PID Controller</a> to apply a countering force. </td>
+     <td width="20%" valign="top" text-align="left"> Finally, I added an <b> Air Stabilizer </b> that tries to keep the boat upright. Also to handle the rough landings this component looks at the grounds normal and tries to align accordingly. It does this by projecting each hover components distance to a plane, then feeding the error into a <a href="https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller">PID Controller</a> to apply a countering force. </td>
     <td ><img src="Images\DustyDeliveries_AirStabilizer.gif" /> <i>With Lateral stabilizer, Yaw Stabilizer and Air Stabilizer (and more speed)</td>
   </tr>
 </table>
