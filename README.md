@@ -4,7 +4,7 @@ This page contains a preview of all my projects, click the name of the project t
 
 # Games
 
-## [***Mr A's Laboratory***](MrA'sLaboratory/) ← (more info)
+## [***Mr A's Laboratory***](MrA'sLaboratory/#README) ← (more info)
 
 Developed: *2023 September - 2023 October*  
 Engine: Unity  
@@ -24,7 +24,7 @@ Team: 3 Programmers and 4 Artists
 
 ---
 
-## [***Dusty Deliveries***](DustyDeliveries/) ← (more info)
+## [***Dusty Deliveries***](MrA'sLaboratory#mr-as-laboratory) ← (more info)
 
 Developed: *2023 Mars - 2023 May*  
 Engine: Unreal Engine 5.1  
