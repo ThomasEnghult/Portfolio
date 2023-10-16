@@ -621,7 +621,7 @@ public class Liquid : MonoBehaviour
 <table>
   <tr>
     <td width="35%" valign="top" text-align="left">The hammer uses two scripts, Crusher.cs and Crushable.cs.<br><br>
-Adding the Crusher script to a GameObject allows it to crush, and the Crushable script allows it to be crushed by the Crusher. <br><br> I had many versions of this, but ultimately had to disable collision between the hammer and rock. <br><br> The particle effect looks at the material color of crushable object to match the color.</td>
+Adding the Crusher script to a GameObject allows it to crush, and the Crushable script allows it to be crushed by the Crusher. <br><br> I had many versions of this, at first the object got knocked away from being hit by the hammer, but that only caused frustration as things got out of reach, so I settled for a trigger collision instead. <br><br> The particle effect looks at the material color of crushable object to match the color.</td>
     <td><img src="Images\MrA_Hammer.gif" width="100%" /></td>
   </tr>
 </table>
