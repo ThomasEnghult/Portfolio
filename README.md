@@ -62,6 +62,8 @@ Team: 3 Programmers and 4 Artists
 
 ## *Game Jams*
 
+**Global Game Jam 2024** - [BURT GETS HURT](https://emilcarlssonart.itch.io/burtgetshurt)
+
 **Global Game Jam 2023** - [Seed of Eden](https://v3.globalgamejam.org/2023/games/seed-eden-4)
 
 **Game Jam at Yrgo 2022** - [Close to Midnight](https://thomasenghult.itch.io/close-to-midnight) *(playable in browser!)*
