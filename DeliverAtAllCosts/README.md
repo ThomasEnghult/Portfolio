@@ -3,11 +3,13 @@
 <img src="Images\DAAC-Logo-Vector_Logo.png" width="50%"/>
 
 [Website](https://www.deliveratallcosts.com/)  
-[Steam Page](https://store.steampowered.com/app/1880610/Deliver_At_All_Costs/)
+[Steam Page](https://store.steampowered.com/app/1880610/Deliver_At_All_Costs/)  
+[Studio](https://www.faroutgamestudio.com/)
 
-
-Gameplay Programmer  
+Worked as **Gameplay Programmer**  
 *2023 december - 2024 october*
+
+I really enjoyed my time at Far Out Games developing their dream game. I had so much fun working on this immersive world and I gained a lot of valuable experience.
 
 ## Gameplay
 
@@ -30,7 +32,7 @@ Gameplay Programmer
 - Puzzle design
 - Cutscenes
 
-**Car Improvements**  
+**Car Improvements I made:**  
 - Added features to the car.
 - Improved existing features.
 - Fixed physics related bugs.
