@@ -31,7 +31,10 @@ Gameplay Programmer
 - Puzzle design
 - Cutscenes
 
-I improved features of the car, adding features and fixing physics related bugs.
+**Car Improvements**  
+- Added features to the car.
+- Improved existing features.
+- Fixed physics related bugs.
 
 ---
 
@@ -39,8 +42,8 @@ I improved features of the car, adding features and fixing physics related bugs.
 
 <table>
   <tr>
-    <td width="50%"><img src="Images\DAAC-GIFs-003.gif"/></td>
-     <td width="50%"><img src="Images\DAAC-GIFs-004.gif"/></td>
+    <td ><img src="Images\DAAC-GIFs-003.gif"/></td>
+     <td ><img src="Images\DAAC-GIFs-004.gif"/></td>
   </tr>
 </table>
 
