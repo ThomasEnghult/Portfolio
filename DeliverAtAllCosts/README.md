@@ -1,7 +1,6 @@
-<img src="Images\DAAC-Logo-Vector_Logo.png" width="50%"/>  
-
 # *Deliver At All Costs*
 
+<img src="Images\DAAC-Logo-Vector_Logo.png" width="50%"/>
 
 [Website](https://www.deliveratallcosts.com/)  
 [Steam Page](https://store.steampowered.com/app/1880610/Deliver_At_All_Costs/)
