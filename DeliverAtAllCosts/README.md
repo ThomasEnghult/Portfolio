@@ -1,0 +1,54 @@
+<img src="Images\DAAC-Logo-Vector_Logo.png" width="50%"/>  
+
+# *Deliver At All Costs*
+
+
+[Website](https://www.deliveratallcosts.com/)  
+[Steam Page](https://store.steampowered.com/app/1880610/Deliver_At_All_Costs/)
+
+
+Gameplay Programmer  
+*2023 december - 2024 october*
+
+## Gameplay
+
+<table>
+  <tr>
+    <td ><img src="Images\DAAC-GIFs-001.gif"/></td>
+    <td ><img src="Images\DAAC-GIFs-002.gif"/></td>
+  </tr>
+</table>
+
+**During my time at Far Out Games I implemented:** 
+- 10 unique Encounters (side missions) 
+- 1 Main Story Mission
+- 8 unique Upgrades to the Car
+
+**Some of the implementations involves:**
+- Custom AI behaviour
+- Physics interactions with the destructible environment
+- Player ghost showing previous run with save/load
+- Puzzle design
+- Cutscenes
+
+I improved features of the car, adding features and fixing physics related bugs.
+
+---
+
+## Game Design
+
+<table>
+  <tr>
+    <td width="50%"><img src="Images\DAAC-GIFs-003.gif"/></td>
+     <td width="50%"><img src="Images\DAAC-GIFs-004.gif"/></td>
+  </tr>
+</table>
+
+I worked on Currency Progression, developed tools to extract data into spreadsheets and did data analysis with customizable parameters based on player playstyle.
+
+I improved custom car driving feel, by creating custom driving profiles using scriptable objects.  
+Created a custom editor to quickly save/load different profiles.
+
+###  Tools I worked with:  
+[SLATE](https://slate.paradoxnotion.com/): Created cutscenes and custom action clips  
+[NodeCanvas](https://nodecanvas.paradoxnotion.com/): Created FSMs, behaviour trees and custom nodes.
